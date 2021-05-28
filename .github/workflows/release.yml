@@ -43,6 +43,8 @@ jobs:
             asset_extension: .apk
             asset_content_type: application/vnd.android.package-archive
             flutter_path: /opt/hostedtoolcache/flutter
+            java_path: /opt/hostedtoolcache/jdk
+            pub_cache: ~/.pub-cache
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
     needs: draft-release
@@ -52,19 +54,25 @@ jobs:
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
         with:
-          path: ${{ matrix.flutter_path }}
-          key: ${{ runner.os }}-flutter
+          path: |
+          ${{ matrix.flutter_path }}
+          ${{ matrix.java_path }}
+          ${{ matrix.pub_cache }}
+          build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+          ${{ runner.os }}-flutter-
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
           channel: stable
       - name: Install Android dependencies
         if: matrix.target == 'Android'
-        uses: actions/setup-java@v1 # TODO: cache java
+        uses: actions/setup-java@v1
         with:
-          java-version: "12.x"
+          java-version: "11.x"
       - run: flutter create .
-      - run: flutter pub get # TODO: cache pub deps
+      - run: flutter pub get
       # TODO: run lint & test
       # Build the application.
       - run: flutter build -v ${{ matrix.build_target }} --release
