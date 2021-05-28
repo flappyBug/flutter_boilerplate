@@ -55,13 +55,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-          ${{ matrix.flutter_path }}
-          ${{ matrix.java_path }}
-          ${{ matrix.pub_cache }}
-          build/
+            ${{ matrix.flutter_path }}
+            ${{ matrix.java_path }}
+            ${{ matrix.pub_cache }}
+            build/
           key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
           restore-keys: |
-          ${{ runner.os }}-flutter-
+            ${{ runner.os }}-flutter-
       - name: Clone Flutter repository with stable channel
         uses: subosito/flutter-action@v1.5.0
         with:
