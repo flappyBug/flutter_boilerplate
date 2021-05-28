@@ -1,0 +1,86 @@
+# Reference: https://github.com/flutter/gallery/blob/master/.github/workflows/release.yml
+name: Build Android APK
+on:
+  # TODO: add file filter
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+env:
+  APP_NAME: flutter_boilerplate
+jobs:
+  draft-release:
+    name: Draft Github release
+    runs-on: ubuntu-20.04
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+      - name: Draft release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.SHORT_SHA }}
+          release_name: ${{env.APP_NAME}} ${{ env.SHORT_SHA }}
+          draft: true
+          prerelease: true
+
+  create-build:
+    name: Create ${{ matrix.target }} build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        target: [Android]
+        include:
+          - os: ubuntu-20.04
+            target: Android
+            build_target: apk
+            build_path: build/app/outputs/flutter-apk
+            asset_extension: .apk
+            asset_content_type: application/vnd.android.package-archive
+            flutter_path: /opt/hostedtoolcache/flutter
+      # Disable fail-fast as we want results from all even if one fails.
+      fail-fast: false
+    needs: draft-release
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Cache Flutter dependencies
+        uses: actions/cache@1
+        with:
+          path: ${{ matrix.flutter_path }}
+          key: ${{ runner.os }}-flutter
+      - name: Clone Flutter repository with stable channel
+        uses: subosito/flutter-action@v1.5.0
+        with:
+          channel: stable
+      - name: Install Android dependencies
+        if: matrix.target == 'Android'
+        uses: actions/setup-java@v1 # TODO: cache java
+        with:
+          java-version: "12.x"
+      - run: flutter create .
+      - run: flutter pub get # TODO: cache pub deps
+      # TODO: run lint & test
+      # Build the application.
+      - run: flutter build -v ${{ matrix.build_target }} --release
+      - name: Rename build for Android
+        if: matrix.target == 'Android'
+        run: mv app-release.apk $GITHUB_WORKSPACE/${{ env.APP_NAME }}_${{ matrix.target }}.apk
+        working-directory: ${{ matrix.build_path }}
+
+      # Upload the build.
+      - name: Add packaged build to release draft
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.draft-release.outputs.upload_url }}
+          asset_path: ./${{ env.APP_NAME }}_${{ matrix.target }}${{ matrix.asset_extension }}
+          asset_name: ${{ env.APP_NAME }}_${{ matrix.target }}${{ matrix.asset_extension }}
+          asset_content_type: ${{ matrix.asset_content_type }}
