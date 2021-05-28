@@ -50,7 +50,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Cache Flutter dependencies
-        uses: actions/cache@1
+        uses: actions/cache@v2
         with:
           path: ${{ matrix.flutter_path }}
           key: ${{ runner.os }}-flutter
