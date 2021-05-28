@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+printf "\e[33;1m%s\e[0m\n" 'Running the Flutter formatter'
+
+flutter format .  > /dev/null
+
+printf "\e[33;1m%s\e[0m\n" 'Running the Flutter analyzer'
+
+flutter analyze
+if [ $? -ne 0 ]; then
+  exit 1
+fi
