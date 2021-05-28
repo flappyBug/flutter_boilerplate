@@ -17,8 +17,8 @@ A flutter boilerplate setup with reasonable CI, CD
 - CI/CD (Using github actions)
   - [ ] test
   - [ ] coverage
-  - [ ] build apk & publish to release
-  - [ ] cache
+  - [x] build apk & publish to release
+  - [x] cache
 - Badges
   - [ ] test
   - [ ] coverage
