@@ -52,6 +52,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Cache Flutter dependencies
+        id: cache
         uses: actions/cache@v2
         with:
           path: |
