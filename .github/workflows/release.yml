@@ -45,6 +45,7 @@ jobs:
             flutter_path: /opt/hostedtoolcache/flutter
             java_path: /opt/hostedtoolcache/jdk
             pub_cache: ~/.pub-cache
+            gradle_cache: ~/.gradle
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
     needs: draft-release
@@ -59,6 +60,7 @@ jobs:
             ${{ matrix.flutter_path }}
             ${{ matrix.java_path }}
             ${{ matrix.pub_cache }}
+            ${{ matrix.gradle_cache }}
             build/
           key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
           restore-keys: |
