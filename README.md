@@ -10,8 +10,8 @@ A flutter boilerplate setup with reasonable CI, CD
       - [ ] incremental?
     - [x] format
       - [ ] incremental?
-  - [ ] pre-push
-    - [ ] test
+  - [x] pre-push
+    - [x] test
 - [ ] CI/CD
   - [ ] test
   - [ ] coverage
