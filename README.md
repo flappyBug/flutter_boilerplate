@@ -5,7 +5,9 @@ A flutter boilerplate setup with reasonable CI, CD
 # Planned Features
 
 - [ ] Hooks
-  - [ ] pre-commit
+  
+  We need run `git config core.hooksPath .githooks/` in project root dir for the first time to setup hooks.
+  - [x] pre-commit
     - [x] lint
       - [ ] incremental?
     - [x] format
